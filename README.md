@@ -1,2 +1,2 @@
 # Jar2Exe
-WIP
+> go build main.go
